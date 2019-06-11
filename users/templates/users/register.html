@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title_name %}登录 - python圈|(Circle)--人生苦短，我用Python python相关技术社区{% endblock %}
+{% block main %}
+    <style>
+        body{
+            background-color: #76b852;
+        }
+        .login{
+            width: 80%;
+            height: 380px;
+            background-color: #fff;
+            margin: 150px auto;
+            padding: 33px;
+        }
+        #submit{
+            margin: 20px 0;
+        }
+    form{
+        padding: 22px;
+    }
+    </style>
+    <div class="col-md-6 col-md-offset-3 col-xs-12 col-sm-12">
+        <div class="login">
+            <form>
+                {% csrf_token %}
+                <input type="email" class="form-control" name="email" id="email" placeholder="请输入您的注册邮箱"><br>
+                <input type="password" class="form-control" name="password" id="password" placeholder="请输入注册密码"><br>
+                <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="请确认注册密码"><br>
+                <a href="javascript:void(0);" class="btn btn-success btn-block" id="submit">注册</a>
+                <p class="text-center">已有一个账户？<a href="/users/" style="color: #4CAF50;">立刻登录</a></p>
+            </form>
+            <p id="msg" class="text-center"></p>
+        </div>
+        {% load static %}
+        <script src="{% static 'js/lib/jquery.js' %}"></script>
+        <script src="{% static 'users/js/app/register.js' %}"></script>
+    </div>
+
+{% endblock %}

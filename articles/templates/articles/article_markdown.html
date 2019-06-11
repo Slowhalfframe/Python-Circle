@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+    <head>
+        {% load static %}
+        <title>markdown</title>
+        <meta charset="UTF-8">
+        <script src="{% static 'js/lib/jquery.js' %}" ></script>
+        <link rel="stylesheet" href="{% static 'plugins/editor.md-master/css/editormd.css' %}">
+        <!--<link rel="stylesheet" href="{% static '' %}">-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="{% static 'articles/css/app/markdown.css' %}">
+        <script src="{% static 'plugins/editor.md-master/editormd.js' %}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    </head>
+
+    <body>
+    <div class="container-fluid " style="padding:0;">
+    <div class="col-md-2 col-lg-2 left text-center" style="padding:0; overflow-y: auto;">
+        <div class="left-top">
+            <a href="">回首页</a>
+        </div>
+        <div id="types" class="left-ul text-left">
+            <!--<ul id="ul">-->
+                <!--<li><a id="create" value="新建文集" href="javascript:void(0)">新建文集</a></li>-->
+                <!--<li id="llli" style="display:none;">-->
+                    <!--&nbsp;&nbsp;&nbsp;&nbsp;<input id="article-type" name="name" type="text">-->
+                    <!--<button id="article-type-button">提交</button>-->
+                <!--</li>-->
+            <!--&lt;!&ndash;</ul>&ndash;&gt;-->
+            <!--<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">-->
+              <!--<div class="panel panel-default">-->
+                <!--<div class="panel-heading" role="tab" id="headingOne">-->
+                  <!--<h4 class="panel-title">-->
+                    <!--<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">-->
+                      <!--#1-->
+                    <!--</a>-->
+                  <!--</h4>-->
+                <!--</div>-->
+
+                <!--<div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">-->
+
+                  <!--<div class="panel-body">-->
+                    <!--#1内容-->
+                  <!--</div>-->
+
+                  <!--<div class="panel-body">-->
+                    <!--#1内容-->
+                  <!--</div>-->
+
+                <!--</div>-->
+
+              <!--</div>-->
+            <!--</div>-->
+        </div>
+        <div class="left-down text-left">
+            <a href="">
+                设置
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-2 in" style="padding:0;">
+
+            <div style="height:100vh; overflow-y: scroll;">
+                <div class="in-top">
+                    <a id="n_article" href="javascript:void(0)">新建文章</a>
+                    <input id="hidden-1" type="hidden">
+                    <div id="llli2" style="display:none;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <input id="new_article" type="text">
+                        <button id="article-type-button-a">提交</button>
+                    </div>
+                </div>
+
+                <ul class="in-ul">
+                    <!--<li>-->
+                        <!--<img src="123">-->
+
+                        <!--<a href=""><span>2018-17-27</span></a>-->
+                        <!--<a href=""><img src="124"></a>-->
+                    <!--</li>-->
+                </ul>
+            </div>
+
+    </div>
+
+    <div class="col-md-8" style="padding:0; margin: 0;">
+        <!--<form action='' method='POST'>-->
+        <!--{% csrf_token %}-->
+            <!--<input type="submit">-->
+            <div class="text-center">
+                标题
+                <input id="title" type="text" name="title" class="title">
+                <input id="old_title" type="hidden" name="old_title" value="">
+                <a id="alter_submit" href="javascript:void(0)">提交</a>
+            </div>
+
+            <div id="test-editormd">
+            <textarea name="content" style="display: none;"></textarea>
+        </div>
+    </div>
+</div>
+
+        <script>
+            var testEditor;
+            $(function () {
+                $.get("{% static 'plugins/editor.md-master/examples/test.md' %}", function (md) {
+                    testEditor = editormd("test-editormd",{
+                        width:'98%',
+                        height:'87vh',
+                        path:"{% static 'plugins/editor.md-master/lib/' %}",
+                        markdown:md,
+                        codeFold: true,
+                        saveHTMLToTextarea: true,
+                        searchReplace: true,
+                        htmlDecode: "style,script,iframe|on*",
+                        emoji: true,
+                        taskList: true,
+                        tocm: true,                  // Using [TOCM]
+                        tex: true,                   // 开启科学公式TeX语言支持，默认关闭
+                        flowChart: true,             // 开启流程图支持，默认关闭
+                        sequenceDiagram: true,       // 开启时序/序列图支持，默认关闭,
+                        imageUpload: true,
+                        imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                        // {#imageUploadURL: "{% static 'plugins/editor-1.md-master/examples/php/upload.php' %}",#}
+                        // {#imageUploadURL: "{% url 'blog:blog_img_upload' %}",#}
+                        onload: function () {
+                            console.log('onload', this);
+                        }
+                    })
+                })
+            })
+        </script>
+        <script>
+         // 点击新建文集
+		  $(function () {
+
+		      // $('#llli').hide();
+		      // // 点击新建文集
+		      // $('#create').click(function () {
+              //     $('#llli').slideToggle('show')
+              // });
+
+
+		      // 新建文集
+		      // $('#article-type-button').click(function () {
+		      //     // 获取输入的分类名称
+              //     var create_type = $('#article-type').val();
+              //     $.ajax({
+              //         url:'/personal/create_type/',
+              //         method: 'POST',
+              //         data:{'create_type': create_type, 'csrfmiddlewaretoken': '{{csrf_token}}'},
+              //         dataType: 'json',
+              //         success: function (date) {
+              //             console.log(date);
+              //             $("#ul").append("<li><a class=\"click\" value="+ date +" href=\"javascript:void(0)\">"+date+"</a></li>");
+              //         }
+              //     })
+              // });
+              $(function () {
+                  $.ajax({
+                      url: '/articles/markdown_api/',
+                      method : 'get',
+                      data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                      dataType: 'json',
+                      success: function (data) {
+                          console.log(data)
+                         $.each(data,function (i,t) {
+                              // console.log(i);
+                              var b = ''
+                              var a = '<div class="panel-group" role="tablist" aria-multiselectable="true">\
+                                            <div class="panel panel-default">\
+                                            <div class="panel-heading" role="tab">\
+                                                <h4 class="panel-title">\
+                                                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#'+i+'" aria-expanded="true" aria-controls="collapseOne">\
+                                                        '+i+'\
+                                                    </a>\
+                                                </h4>\
+                                            </div>\
+                                            <div id="'+i+'" class="panel-collapse collapse in" role="tabpanel">';
+                             $.each(t, function (k,v) {
+                                 console.log(v)
+                                 b += '<div class="panel-body">\
+                                                         '+v+'\
+                                                       </div>';
+
+                             })
+                             // 拼接完成
+                             // console.log(a+b+'</div> </div></div>')
+                             $("#types").append(a+b+'</div> </div></div>')
+                          })
+                      }
+                  })
+              });
+
+
+		      $('#llli2').hide();
+		      // 点击新建文章显示
+		      $('#n_article').click(function () {
+                  $('#llli2').slideToggle('show')
+              });
+
+		      // 新建文章
+              $('#article-type-button-a').click(function () {
+                  var new_article = $('#new_article').val();
+                  var type = $("#hidden-1").val();
+                  $.ajax({
+                      url: '/personal/new_article/',
+                      method: 'POST',
+                      data:{'new_article': new_article, 'type': type, 'csrfmiddlewaretoken': '{{csrf_token}}'},
+                      dataType:'json',
+                      success: function (date) {
+                          console.log(date);
+                          // 显示出来
+                          $(".in-ul").append("<li>\n" +
+                              "<img src=\"123\">\n" +
+                              "\n" +
+                              "<a href='javascript:void(0)'><span class='article_title'>"+ date +"</span></a>\n" +
+                              "<a href=\"\"><img src=\"124\"></a>\n" +
+                              "</li>")
+                      }
+                  });
+
+                  // 点击文章名显示文章
+                  $('.article_title').click(function () {
+                      var article_name = $(this).html();
+                      console.log(article_name)
+                  });
+              });
+
+
+		      // 请求点击分类文章中的
+		      $('.click').click(function () {
+		          // 用户点击的分类名
+		          var type = $(this).attr('value');
+		          // console.log(type);
+                  $.ajax({
+                      url:'/personal/article_inquire/',
+                      method: 'POST',
+                      data: {'type': type, 'csrfmiddlewaretoken': '{{csrf_token}}'},
+                      dataType: 'json',
+                      success: function (date) {
+                          // 先吧显示的文章列表删除
+                          $('.in-ul').empty();
+                          // 再添加文章列表
+                          $('.in-ul').append();
+                          // console.log(date)
+                          // 循环后台传来的列表
+                          $.each(date, function (k,v) {
+                              // 这是文章标题
+                              $(".in-ul").append("" +
+                                  "<li>\n" +
+                                  "<img src=\"123\">\n" +
+                                  "\n" +
+                                  "<a href='javascript:void(0)'><span class='article_title'>"+v+"</span></a>\n" +
+                                  "<a href=\"\"><img src=\"124\"></a>\n" +
+                                  "</li>");
+
+                              // 添加文章类型
+                              $("#hidden-1").attr('value',type)
+                          });
+
+                          // 点击文章名显示文章
+                          $('.article_title').click(function () {
+                              // 根据文章名称和文章类型查询文章
+                              var article_name = $(this).html();    // 文章名称
+                              var tp = $('#hidden-1').val();        // 文章类型
+                              // console.log(article_name);
+                              // console.log(tp)
+                              $.ajax({
+                                  url:'/personal/select_article_content/',
+                                  method:'POST',
+                                  data:{'title':article_name, 'type':tp, 'csrfmiddlewaretoken':'{{csrf_token}}'},
+                                  dataType:'json',
+                                  success:function(date){
+                                    UE.delEditor('id_content');
+                                    var id_content = UE.getEditor('id_content',
+                                        {'initialFrameWidth': '100%',
+                                        'initialFrameHeight': '600',
+                                        'serverUrl': '/ueditor/controller/?imagePathFormat=&filePathFormat=',
+                                        'autoHeightEnabled': false
+                                    });
+                                    // 展示文章标题
+                                    $('#title').val(date.title);
+                                    // 修改文章时需要的旧标题
+                                    $('#old_title').val(date.title);
+                                    //备注 (json.Body.GoodDescription 为异步请求过来的数据)
+                                    id_content.addListener('ready', function (editor) {
+                                        id_content.setContent(date.content);
+                                    });
+                                  }
+                              })
+                          })}
+                  });
+              });
+
+		      // 修改文章
+		      $('#alter_submit').click(function () {
+		          // 标题
+                  var title = $('#title').val();
+                  // 旧的标题
+                  var old_title = $('#old_title').val();
+                  // 内容
+                  var content = $('#id_content').html();
+                  console.log(content);
+                  $.ajax({
+                      url:'/personal/alter_articles/',
+                      method:'POST',
+                      data:{'title':title, 'old_title':old_title, 'csrfmiddlewaretoken':'{{csrf_token}}'},
+                      dataType:'json',
+                      success:function(date){
+
+                      }
+                  })
+              })
+          })
+    </script>
+    </body>
+</html>

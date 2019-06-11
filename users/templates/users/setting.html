@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block main %}
+{% load static %}
+<h3>邮箱状态</h3>
+<span id="email_action">您还没验证您的邮箱，不能继续操作。快点击进行验证吧 --->>> </span>
+<p id="email_is"></p>
+
+
+<hr>
+
+<h3>修改密码</h3>
+{% csrf_token %}
+<div id="msg"></div>
+<font color=#aaa>请先输入您正确的旧密码</font><br>
+旧密码：<input type="password" name="password" id="password"><br>
+<div id="new_pwd"></div>
+
+
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(document).ready(function () {
+            var token = $('input[name=csrfmiddlewaretoken]').val();
+            form_list = {csrfmiddlewaretoken: token};
+            // console.log(form_list);
+            $.ajax({
+                url: "/users/api/v1/ajax_get_email_is/",
+                method: "POST",
+                dataType: "json",
+                data: form_list,
+                success: function (data) {
+                    console.log(data);
+                    if (data.code == 0) {
+                        $("#email_is").html("<span style='color:green;'>" + data.data + "</span>");
+                        if (data.data == 0) {
+                            console.log("验证邮箱")
+                            $("#email_action").append("<a href='javascript:void(0);' id='send_email' onclick='send_email();' style='color:blue;'>" + "验证邮箱" + "</a>");
+
+                        } else {
+                            console.log("已验证邮箱")
+                            $("#email_action").html("<span style='color:green;'>" + "已验证邮箱" + "</span>");
+                        }
+                    }
+                }
+            })
+        });
+
+        function send_email() {
+            var token = $('input[name=csrfmiddlewaretoken]').val();
+            form_list = {csrfmiddlewaretoken: token};
+            // console.log(form_list);
+            $.ajax({
+                url: "/users/api/v1/ajax_send_check_email/",
+                method: "POST",
+                dataType: "json",
+                data: form_list,
+                success: function (data) {
+                    console.log(data);
+                    if (data.code == 0) {
+                        $("#email_is").html("<span style='color:green;'>" + data.msg + "</span>");
+                    }
+                    if (data.code == -1) {
+                        $("#email_is").html("<span style='color:red;'>" + data.msg + "</span>");
+                    }
+                }
+            })
+        }
+
+        $(function () {
+        $("#password").on("blur", function () {
+            var token = $('input[name=csrfmiddlewaretoken]').val();
+            var old_password = $("#password").val();
+            id = {{request.user.id}}
+            form_list = {csrfmiddlewaretoken: token};
+            form_list['id'] = id;
+            form_list['old_password'] = old_password;
+            // console.log(form_list);
+            $.ajax({
+                url: "/users/api/v1/ajax_get_oldpassword/",
+                method: "POST",
+                dataType: "json",
+                data: form_list,
+                success:function (data) {
+                    console.log(data)
+                    if (data.code == -1){
+                        $("#msg").html("<span style='color:red;'>" + data.msg + "</span>");
+                        $("#new_pwd").empty();
+                    }
+                    if (data.code == 0){
+                        // $("#msg").html("<span style='color:green;'>" + data.msg + "</span>");
+                        $("#new_pwd").html("新密码："+"<input type='password' name='new_password' id='new_password'><br>"+
+                            "确认新密码："+"<input type='password' name='confirm_password' id='confirm_password'>"+
+                                "<br><a class='btn btn-success' href='javascript:void(0);' onclick='change_password()' id='change_password'>修改密码</a>"
+                        );
+                    }
+                }
+            })
+        })
+    });
+
+    function change_password() {
+        var old_Pwd = $("#password").val();
+        var new_pwd = $("#new_password").val();
+        var confirm_pwd = $("#confirm_password").val();
+        // console.log(new_pwd, confirm_pwd);
+        var token = $('input[name=csrfmiddlewaretoken]').val();
+        id = {{request.user.id}}
+        form_list = {csrfmiddlewaretoken: token};
+        form_list['id'] = id;
+        form_list['old_Pwd'] = old_Pwd;
+        form_list['new_pwd'] = new_pwd;
+        form_list['confirm_pwd'] = confirm_pwd;
+        // console.log(form_list);
+        $.ajax({
+            url: "/users/api/v1/ajax_change_password/",
+            method: "POST",
+            dataType: "json",
+            data: form_list,
+            success:function (data) {
+                console.log(data);
+                $("#msg").html("<span style='color:red;'>" + data.msg + "</span>");
+                if(data.code==0){
+                    $("#msg").html("<span style='color:green;'>" + data.msg + "</span>");
+                    setTimeout("javascript:location.href='/users/'", 2000);
+                }
+                // 退出当前登录 到登录页面
+            }
+        })
+    }
+    </script>
+{% endblock %}

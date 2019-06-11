@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block main %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'articles/css/app/article.css' %}">
+    <div class="col-md-8 main-left">
+            <p style="font-size: 12px;font-family: '微软雅黑 Light';font-weight: 600;color: red;margin: 10px 0;"><span class="glyphicon glyphicon-volume-up"></span>&nbsp;<a
+            href="http://www.ofus.ink/articles/article/42/" style="color: red;">近日更新内容</a></p>
+        <div class="content">
+            <div id="articles_box">
+                {% for a in page.object_list %}
+                    <div class="media">
+                        <ol class="breadcrumb" style="margin: 0;background-color: #fff;padding-left: 0px;">
+                            <li style="color: #009a61;"><a href="/articles/show_article_type/{{a.article_type.parent.pk}}/">{{ a.article_type.parent.name }}</a></li>
+                            <li class="active" style="color: #5cb85c;"><a href="/articles/show_article_type/{{a.article_type.pk}}/">{{ a.article_type.name }}</a></li>
+                        </ol>
+                        <h4 class="media-heading"><a target="_blank" href="/articles/article/{{ a.id }}">{{ a.title }}</a>&nbsp;<small>{% if a.article_from == 'yuanchuang' %}
+								<span id="yc">原创</span>
+								{% elif a.article_from == 'zhuanzai'%}
+								<span id="zz">转载</span>
+								{%endif%}</small></h4>
+                        <div class="media-body">
+                            <div class="zhaiyao">
+                                {{ a.zhaiyao|safe|truncatechars:79 }}
+                            </div>
+                            <div class="info">
+                                发布时间：{{ a.create_time }} | 阅读量：{{ a.count }} | <a
+                                    href="/users/user_detail/?id={{ a.user.id }}" target="_blank">作者：{{ a.user_more_info.u_nick_name }}</a>
+                            </div>
+                        </div>
+                        {% if a.cover_img %}
+                            <div class="media-left">
+                                <a href="/articles/article/{{ a.id }}">
+                                    <img class="media-object show_header"
+                                         src="/static/articles/uepload/{{ a.cover_img }}">
+                                </a>
+                            </div>
+                        {% else %}
+
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            {# django自带分页器 #}
+            <div class="row  col-md-8 col-md-offset-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {% if page.has_previous %}
+                            <li>
+                                <a href="/index?pageNow={{ page.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for p in page.paginator.page_range %}
+                            {% if page.number == p %}
+                            <li class="active"><a href="/index/?pageNow={{ p }}">{{ p }}</a></li>
+                            {% else %}
+                            <li><a href="/index/?pageNow={{ p }}">{{ p }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page.has_next %}
+                            <li>
+                                <a href="/index?pageNow={{ page.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 main-right">
+        <div class="type">
+<!--            <a class='btn btn-default' href="/articles/add_article/">写文章</a>-->
+            <!--<a class="btn btn-default" href="/articles/markdown">markdown</a>-->
+        </div>
+        <div class="panel panel-default" style="margin-top: 15px;">
+  <div class="panel-heading"><strong>文章分类</strong>
+      <a href="http://www.ofus.ink/question/answer/5/" target="_blank" title="没有你想要的分类？点击告诉管理员吧！"><span class="layui-badge-rim layui-bg-orange pull-right">?</span></a>
+  </div>
+  <div class="panel-body" style="padding: 0;">
+    <div class="layui-collapse" lay-accordion>
+        {% for type in type_list %}
+        <div class="layui-colla-item">
+            <h2 class="layui-colla-title" onclick="get_chrild_type({{type.id}})">{{ type.name }}</h2>
+            <div class="layui-colla-content" style="padding: 0;" id="get_chrild_type{{type.id}}">
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+        <div id="hot_user">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+              <b>最近登录用户</b>
+              <span class="pull-right" id="h_u_tips" title="根据最近一次登录时间显示前五位用户">!</span>
+          </div>
+          <ul class="list-group">
+              {% for hot_user in hot_user %}
+            <li class="list-group-item" style="height: 35px;">
+                <a href="/users/user_detail/?id={{hot_user.id}}">{{hot_user.user_more_info.u_nick_name}}</a>
+            </li>
+              {% endfor %}
+          </ul>
+        </div>
+    </div>
+
+    <ul class="list-group">
+      <li class="list-group-item">网站文章总数：<b>{{ article_num|add:500}}</b></li>
+      <li class="list-group-item">注册用户总数：<b>{{ user_num|add:69}}</b></li>
+    </ul>
+        <!--<div class="hot-user">-->
+            <!--<h4 id="hot_users">热门用户</h4>-->
+            <!--<ul class="list-group">-->
+                <!--<li class="list-group-item">圈(quaner)</li>-->
+            <!--</ul>-->
+        <!--</div>-->
+        <button class="btn btn-block btn-default" onclick="window.open('https://jq.qq.com/?_wv=1027&k=5tsKZJl')">加入QQ群</button>
+        <footer>
+            &copy; 2019 python圈 | (Circle) 专注python相关技术<br>
+            科技界的一股清流，情怀程序yuan！<br>
+            备案号：<a href="http://www.miibeian.gov.cn">豫ICP备18037195号-1</a>
+            <p><a href="http://www.ofus.ink/sitemap.xml">网站地图</a> | <a href="http://www.ofus.ink/robots.txt">robots协议</a></p>
+            <div id="link">
+                <b>友情链接: </b>
+                <a href="https://www.baidu.com/">百度</a> |
+                <a href="https://www.so.com/">360搜索</a> | 
+                <a href="https://www.google.com.hk/">谷歌</a>
+            </div>
+        </footer>
+    </div>
+{% endblock %}
+
+
+{#js#}
+{% block js %}
+    <script>
+        function get_chrild_type(obj) {
+        $.ajax({
+            url: "/get_chrild_type/?type_id="+obj,
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                $("#get_chrild_type"+obj).empty();
+                var count = 0;
+                while(count<data.data.length){
+                    html = '<li class="list-group-item"><a href="/articles/show_article_type/'+ data.data[count].id +'/">'+ data.data[count].name +'<span class="pull-right layui-badge layui-bg-blue">'+ data.data[count].c +'</span></a></li>';
+                    $("#get_chrild_type"+obj).append(html);
+                    $(this).prop("onclick",null).off("click");
+                    count += 1
+                }
+            }
+        })
+    }
+        /*num = 1
+        function next() {
+            $("#articles_box").empty()
+            $.ajax({
+                url: "/load_articles/?pageNow=" + num,
+                method: "GET",
+                dataType: "json",
+                data: {"csrfmiddlewaretoken": "{{ csrf_token }}"},
+                success: function (data) {
+                    returnstr = JSON.parse(data.msg);
+                    console.log(returnstr);
+                    if (data.success) {
+                        for (var i = 0; i < returnstr.length; i++) {
+                            fl = "<div class='media'><ol class='breadcrumb' style='margin: 0;background-color: #fff;padding-left: 0px;'><li><a href='#' style='color: #009a61;'>{{ a.article_type.parent.name }}</a></li><li class='active' style='color: #5cb85c;'>{{ a.article_type.name }}</li></ol>";
+                            tit = "<h4 class='media-heading'><a href='/articles/article/"+ returnstr[i].fields.pk +"'>"+ returnstr[i].fields.title +"</a></h4>";
+                            zhaiyao = "<div class='media-body'><div class='zhaiyao'>"+ returnstr[i].fields.zhaiyao +"</div>";
+                            info = "<div class='info'>发布时间："+ returnstr[i].fields.create_time +" | 阅读量："+ returnstr[i].fields.count +" | <a href=''>作者：" + returnstr[i].fields.user_more_info + "</a></div></div>";
+                            cover = "<div class='media-left'> <a href='/articles/article/" + returnstr[i].fields.pk + "'><img class='media-object show_header' src='static/articles/uepload/" + returnstr[i].fields.cover_img+ "'></a></div>"
+                            end = "</div>";
+                            if(returnstr[i].fields.cover_img){
+                                $("#articles_box").append(fl+tit+zhaiyao+info+cover+end);
+                            }else{
+                                $("#articles_box").append(fl+tit+zhaiyao+info+end);
+                            }
+
+
+                        }
+                    }
+                }
+            })
+        }
+
+        $('#next').click(function () {
+            num += 1;
+            next()
+        });
+
+        $('#up').click(function () {
+            num -= 1;
+            if (num >= 1){
+                next()
+            }else {
+                num = 1
+            }
+        });*/
+    </script>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title_name %}
+    文章分类 - python圈|(Circle)--人生苦短，我用Python python相关技术社区
+{% endblock %}
+{% block main %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'articles/css/app/article.css' %}">
+    <div class="col-md-8 main-left">
+        <div class="content">
+            <div id="articles_box">
+                {% if page.object_list %}
+                {% for a in page.object_list %}
+                    <div class="media">
+                        <ol class="breadcrumb" style="margin: 0;background-color: #fff;padding-left: 0px;">
+                            <li style="color: #009a61;"><a href="/articles/show_article_type/{{a.article_type.parent.pk}}/">{{ a.article_type.parent.name }}</a></li>
+                            <li class="active" style="color: #5cb85c;"><a href="/articles/show_article_type/{{a.article_type.pk}}/">{{ a.article_type.name }}</a></li>
+                        </ol>
+                        <h4 class="media-heading"><a target="_blank" href="/articles/article/{{ a.id }}">{{ a.title }}</a>
+                            <small>{% if a.article_from == 'yuanchuang' %}
+								<span id="yc">原创</span>
+								{% elif a.article_from == 'zhuanzai'%}
+								<span id="zz">转载</span>
+								{%endif%}</small>
+                        </h4>
+                        <div class="media-body">
+                            <div class="zhaiyao">
+                                {{ a.zhaiyao|safe|truncatechars:79 }}
+                            </div>
+                            <div class="info">
+                                发布时间：{{ a.create_time }} | 阅读量：{{ a.count }} | <a
+                                    href="/users/user_detail/?id={{ a.user.id }}" target="_blank">作者：{{ a.user_more_info.u_nick_name }}</a>
+                            </div>
+                        </div>
+                        {% if a.cover_img %}
+                            <div class="media-left">
+                                <a href="/articles/article/{{ a.id }}">
+                                    <img class="media-object show_header"
+                                         src="/static/articles/uepload/{{ a.cover_img }}">
+                                </a>
+                            </div>
+                        {% else %}
+
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                {% else %}
+                <p style="color: dodgerblue;">目前分类下暂无文章，期待您的作品！！</p><br><br>
+                <a href="http://www.ofus.ink/articles/add_article/">我要写文章</a> |
+                <a href="javascript:history.back(-1)">返回上一级</a>
+                {% endif %}
+            </div>
+            {# django自带分页器 #}
+            <div class="row  col-md-8 col-md-offset-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {% if page.has_previous %}
+                            <li>
+                                <a href="/articles/show_article_type/{{type_id}}/?pageNow={{ page.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for p in page.paginator.page_range %}
+                            <li><a href="/articles/show_article_type/{{type_id}}/?pageNow={{ p }}">{{ p }}</a></li>
+                        {% endfor %}
+
+                        {% if page.has_next %}
+                            <li>
+                                <a href="/articles/show_article_type/{{type_id}}?pageNow={{ page.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 main-right">
+        <div class="type">
+            <a class='btn btn-default' href="/articles/add_article/">写文章</a>
+        </div>
+
+        <div class="hot-user">
+            <h4 id="hot_users">相关分类</h4>
+            <ul class="list-group">
+                <li class="list-group-item"><a href="#">待补充相关分类</a></li>
+            </ul>
+        </div>
+        <button class="btn btn-block btn-default" onclick="window.open('https://jq.qq.com/?_wv=1027&k=5tsKZJl')">加入QQ群</button>
+        <footer>
+            &copy; 2019 python圈 | (Circle) 专注python相关技术<br>
+            科技界的一股清流，情怀程序yuan！<br>
+            备案号：<a href="http://www.miibeian.gov.cn">豫ICP备18037195号-1</a>
+            <p><a href="http://www.ofus.ink/sitemap.xml">网站地图</a> | <a href="http://www.ofus.ink/robots.txt">robots协议</a></p>
+            <div id="link">
+                <b>友情链接: </b>
+                <a href="https://www.baidu.com/">百度</a> |
+                <a href="https://www.so.com/">360搜索</a> |
+                <a href="https://www.google.com.hk/">谷歌</a>
+            </div>
+        </footer>
+    </div>
+{% endblock %}
+
+
+{#js#}
+{% block js %}
+
+{% endblock %}

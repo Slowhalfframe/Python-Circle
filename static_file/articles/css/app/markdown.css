@@ -1,0 +1,93 @@
+.body{
+    overflow: hidden;
+    touch-action: none;
+}
+
+.left{
+    height: 100vh;
+    background-color: #404040;
+}
+
+.left-top{
+    margin-top: 50px;
+}
+
+.left-top > a{
+    display: block;
+    text-decoration: none;
+    color: #ec7259;
+    border-radius: 40px;
+    padding: 10px 0;
+    margin: 0 10px;
+    border: 1px solid #ec7259;
+}
+
+.left-ul{
+    list-style: none;
+    margin-top: 10px;
+}
+
+.left-ul > ul > li{
+
+}
+
+.left-ul > ul > li > a{
+    padding: 15px;
+    display: block;
+    text-decoration: none;
+    color: #fffffc;
+    font-size: 16px;
+}
+
+.left-ul > ul > li > a:hover{
+    background-color: #666;
+}
+
+.left-down{
+    position: fixed;
+    bottom: 0;
+}
+
+.left-down > a{
+    display: block;
+    text-decoration: none;
+    color: #999;
+    font-size: 16px;
+    padding: 20px 20px;
+}
+/********************************************/
+
+.in{
+
+}
+
+.in-top{
+
+}
+
+.in-top > a{
+    text-decoration:none;
+    font-size: 16px;
+    display: block;
+    color: #262626;
+    padding: 20px 10px;
+}
+
+.in-ul{
+    list-style: none;
+}
+
+.in-ul > li{
+    display: block;
+    padding: 30px 10px 30px 20px;
+    border-top: 2px solid #e6e6e6;
+    border-bottom: 2px solid #e6e6e6;
+}
+
+.title{
+    width: 500px;
+    height: 50px;
+    border: 1px solid ;
+    border-radius: 10px;
+    margin: 10px;
+}

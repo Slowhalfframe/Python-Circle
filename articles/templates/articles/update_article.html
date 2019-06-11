@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% block title_name %}
+    修改文章文章 - python圈|(Circle)--人生苦短，我用Python python相关技术社区
+{% endblock %}
+{% block main %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'articles/css/app/editor.css' %}">
+    <div class="col-md-8">
+        <div id="msg"></div>
+        <form enctype="multipart/form-data" id="form1">
+            {% csrf_token %}
+            <input type="text" value="{{request.user.id}}" hidden name="u_id">
+            <input type="text" value="{{article.id}}" hidden name="article_id">
+            <div class="form-group">
+                <label><h4>文章标题</h4></label>
+                <input type="text" class="form-control" onblur="check_title()" value="{{article.title}}" placeholder="请输入标题" name="title" id="title">
+            </div>
+            <script id="id_content" name="content"  style="display: inline-block;" type="text/plain">{{article.content|safe}}</script>
+            <link rel="stylesheet" href="/static/ueditor/themes/default/css/ueditor.css">
+            <script type="text/javascript" src="/static/ueditor/ueditor.config.js"></script>
+            <script type="text/javascript" src="/static/ueditor/ueditor.all.min.js"></script>
+            <script type="text/javascript" src="/static/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+
+            <script type="text/javascript">
+                var id_content = UE.getEditor('id_content',{
+                    'initialFrameWidth': 730,
+                    'initialFrameHeight': 320,
+                    'serverUrl': '/ueditor/controller/?imagePathFormat=&filePathFormat='
+                });
+                id_content.ready(function(){
+
+                });
+            </script>
+    </div>
+    <div class="col-md-4">
+        <div id="update_cover">
+            <label><h4>文章封面图片</h4></label><br>
+            {% if article.cover_img %}
+            <img src="/static/articles/uepload/{{article.cover_img}}" width="99px" height="80px">
+            {% else %}
+            您还未上传封面图片
+            {% endif %}
+            <input type="file" name="cover_img" id="cover_img" onchange="fileChange(this)">
+        </div>
+        <div id="editor_zy">
+            <label><h4>文章摘要</h4></label>
+            <textarea class="form-control" rows="2" name="zhaiyao" id="zhaiyao">{{article.zhaiyao}}</textarea>
+        </div>
+        <div id="editor_type">
+            <!-- 二级联动 -->
+            <label><h4>分类目录</h4></label><br>
+            <select required name="type1" id="type1">
+                <option value="-1">请选择一级类型</option>
+                {% for t in type1 %}
+                <option value="{{t.id}}" {% if article.article_type.parent == t %}selected{%else%}{%endif%}>{{t.name}}</option>
+                {% endfor %}
+            </select>
+        <select name="type2" id="type2">
+            {% for t in type2 %}
+                <option value="{{t.id}}" {% if article.article_type == t %}selected{%else%}{%endif%}>{{t.name}}</option>
+            {% endfor %}
+        </select>
+        </div>
+        <div id="editor_from">
+            <label><h4>文章来源</h4></label><br>
+            <select required name="editor_from" id="editor_from_select">
+                <option value="-1">请选择文章类型</option>
+
+                <option value="1" {% if article.article_from == 'yuanchuang' %}selected{%else%}{%endif%}>原创</option>
+                <option value="2" {% if article.article_from == 'zhuanzai' %}selected{%else%}{%endif%}>转载</option>
+            </select>
+        </div>
+        <!--<div id="editor_bq">-->
+            <!--<label><h4>标签</h4></label><br>-->
+            <!--<input type="text" placeholder="标签（后续添加）" name="biaoqian" id="biaoqian">-->
+        <!--</div>-->
+        <div id="editor_over">
+            <!--<button class="submit btn btn-default">保存草稿</button>-->
+            <a class="submit btn btn-success btn-block" id="fabu" href="javascript:void(0);" type="submit" id="fabu">修改</a>
+        </div>
+        </form>
+
+    </div>
+
+{% endblock %}
+{% block js %}
+<script>
+    function check_title(){
+        var title = $("#title").val();
+        if(title.length >= 66){
+            alert("文章标题过长，请修改")
+        }
+    }
+
+    function fileChange(target) {
+     var fileSize = 0;
+     if (!target.files) {
+       var filePath = target.value;
+       var fileSystem = new ActiveXObject("Scripting.FileSystemObject");
+       var file = fileSystem.GetFile (filePath);
+       fileSize = file.Size;
+     } else {
+      fileSize = target.files[0].size;
+      }
+
+      var name=target.value;
+      var fileName = name.substring(name.lastIndexOf(".")+1).toLowerCase();
+      // if(fileName !="xls" && fileName !="xlsx"){
+      if(fileName !="jpg"  && fileName !="png"){
+          alert("请选择.jpg,.png格式图片上传！");
+          target.value="";
+          return
+      }
+    }
+
+    $(function () {
+        $("#type1").on("change",function () {
+            var token = $('input[name=csrfmiddlewaretoken]').val();
+            form_list = {csrfmiddlewaretoken: token};
+            form_list['parent_id'] = $(this).val();
+            console.log(form_list);
+            $.ajax({
+                url: "/articles/api/v1/get_two_types/",
+                method: "POST",
+                dataType: "json",
+                data: form_list,
+                success: function (data) {
+                    $("#type2").empty();
+                    console.log(data);
+                    for (var i = 0; i < data.length; i++) {
+                        var type = data[i];
+                        $op = $("<option>");
+                        $op.attr("value", type.pk);
+                        $op.text(type.fields.name);
+                        $("#type2").append($op)
+                    }
+                },
+                error: function () {
+                    alert("网络异常，请重新点击")
+                }
+            });
+        });
+});
+
+
+$(function () {
+    $("#fabu").click(function () {
+
+        var formdata = new FormData(document.getElementById("form1"));//可以上传文件
+        console.log(formdata)
+            $.ajax({
+                url:'/articles/api/v1/update_article/',
+                data:formdata,
+                    contentType: false,//默认: "application/x-www-form-urlencoded"
+                    processData: false,//设置 processData 选项为 false，防止自动转换数据格式
+                type:"post",
+                dataType:"json",
+                success:function(data){
+                    if(data.code == 0){
+                        console.log(data.msg, data.data);
+                        url = '/articles/article/'+data.data;
+                        $("#msg").html("<span style='color:green;'>" + data.msg + "2秒后为您跳转文章详情页</span>");
+                        setTimeout("javascript:location.href= url", 2000);
+                    }else{
+                        alert(data.msg)
+                    }
+                },
+                error:function(er){
+                    alert('网络异常，请重试！');
+                }
+            });
+    })
+});
+</script>
+{% endblock %}

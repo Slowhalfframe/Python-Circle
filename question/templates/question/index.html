@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title_name %} 问答{% endblock %}
+{% block main %}
+{% load static %}
+
+        <div class="col-md-8 main-left">
+            <div class="content">
+                <div>
+                    <div id="box"></div>
+                    {% csrf_token %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 main-right">
+            <div class="type">
+                <button class="btn btn-default">
+                    <a href="/question/add_question/">提问</a>
+                </button>
+            </div>
+        </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+    $(document).ready(function (){
+        var token = $('input[name=csrfmiddlewaretoken]').val();
+        form_list = {csrfmiddlewaretoken: token};
+        console.log(form_list);
+        $.ajax({
+            url: "/question/api/v1/get_question_answer_list/",
+            method: "POST",
+            dataType: "json",
+            data: form_list,
+            success: function (data) {
+                if (data.code == 0) {;
+                    var xunhun_num = 0;
+                    $.each(data.data.questions_answer_list, function(){
+                        url = '/question/answer/' + data.data.questions_answer_list[xunhun_num].q_id + '/';
+                        link = "<h4><a href='"+ url +"'>"+ data.data.questions_answer_list[xunhun_num].q_title +"</a></h4>";
+                        answer_auth = "<span class='answer_auth'>"+ data.data.questions_answer_list[xunhun_num].answer_auth +"</span>";
+                        answer_url = '/question/answer/detail/'+ data.data.questions_answer_list[xunhun_num].a_id;
+                        answer_link = "<a href='"+ answer_url +"' style='color: #00a0e9;'>点击查看全文</a>";
+                        answer = "<div class='answer'><b>最后的回答：</b>" + data.data.questions_answer_list[xunhun_num].answer_content+ answer_link + "</div>";
+                        answer_count = "<span class='zan'>回答：" + data.data.questions_answer_list[xunhun_num].answer_count + "</span>&nbsp;&nbsp;  " +
+                            "  &nbsp;&nbsp;<span class='browse'>浏览量：" + data.data.questions_answer_list[xunhun_num].answer_browse +
+                            "</span>";
+                        {#data.data.questions[xunhun_num].q_id#}
+                        $("#box").append("<div class='media' style='min-height:130px;'>" + link + "<div class='media-body'><div class='zhaiyao'>" + answer + "</div><div class='info'>"+ answer_count +"</div></div>" + "</div>");
+                        xunhun_num += 1;
+                    })
+                }
+            }
+        })
+    })
+</script>
+{% endblock %}

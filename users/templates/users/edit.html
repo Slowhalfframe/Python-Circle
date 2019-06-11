@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title_name %} 修改个人资料 {% endblock %}
+{% block main %}
+
+    <style>
+        .top_box {
+            width: 100%;
+            height: 134px;
+            background-color: #eee;
+        }
+
+        .bottom_box {
+            width: 100%;
+            height: 134px;
+            background: #fff;
+        }
+
+        .header {
+            width: 150px;
+            height: 150px;
+            margin-top: -50px;
+            margin-left: 20px;
+        }
+
+        .header img {
+            border-radius: 15px;
+        }
+
+        .infos {
+            margin: 33px;
+        }
+
+        .name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .qm {
+            margin: 25px 0;
+        }
+
+        .change {
+            margin: 66px 30px;
+        }
+    h4{
+        padding: 10px 0 5px;
+    }
+    </style>
+    <div class="boxs">
+        <div class="top_box">
+        </div>
+        <div class="bottom_box">
+            <div class="header pull-left">
+                <img src="/static/articles/uepload/{{ user_more_info.u_header }}" width="100%" height="100%">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">
+                  修改头像
+                </button>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal" method="post" action="/users/change_header/" enctype="multipart/form-data">
+            {% csrf_token %}
+          <div class="form-group">
+            <label for="update_file" class="col-sm-2 control-label">选择图片</label>
+            <div class="col-sm-10">
+                <input type="file" name="header" id="update_file" onchange="check_img()" required>
+                <input type="text" name="user" value="{{request.user.id}}" hidden required>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <button type="submit" class="btn btn-default">修改</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+            </div>
+            <div class="infos pull-left">
+                <div class="name" id="name">{{ user_more_info.u_nick_name }}</div>
+                <div class="qm" id="qm">{{ user_more_info.u_autograph }}</div>
+            </div>
+            <div class="change pull-right">
+                <button class="btn"><a href="/users/my_page/">返回个人主页</a></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 col-md-offset-2">
+        <div id="change_nickname">
+            <input type="text" name="new_name" id="new_name" class="form-control" placeholder="{{ user_more_info.u_nick_name }}">
+            <button class="btn btn-block btn-primary" id="chage_name">修改昵称</button>
+        </div>
+        <br>
+        <div id="change_qm">
+            <textarea class="form-control"  name="new_qm" id="new_qm" cols="20" rows="5">{{ user_more_info.u_autograph }}</textarea>
+            <button class="btn btn-block btn-primary" id="change_qmm">修改签名</button>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+
+    <script>
+        $(function () {
+            $("#chage_name").click(function () {
+                upon_user = {{request.user.id}}
+                new_name = $("#new_name").val();
+                if (new_name.length > 1) {
+                    var token = $('input[name=csrfmiddlewaretoken]').val();
+                    form_list = {csrfmiddlewaretoken: token};
+                    form_list['new_name'] = new_name;
+                    form_list['u_id'] = upon_user;
+                    $.ajax({
+                        url: "/users/api/v1/ajax_change_new_name/",
+                        method: "POST",
+                        dataType: "json",
+                        data: form_list,
+                        success: function (data) {
+                            console.log(data);
+                            if (data.code == 0) {
+                                $("#name").html("<span style='color:green;'>" + data.data + "</span>");
+                                $("#msg").html("<span style='color:green;'>" + data.msg + "</span>")
+                                $("#new_name").attr("placeholder", data.data);
+                            }
+                        }
+                    })
+                }else{
+                    alert("您填写的新昵称真短")
+                }
+            })
+        });
+
+
+        $(function () {
+            $("#change_qmm").click(function () {
+                upon_user = {{request.user.id}}
+                new_qm = $("#new_qm").val();
+                if (new_qm.length > 1) {
+                    var token = $('input[name=csrfmiddlewaretoken]').val();
+                    form_list = {csrfmiddlewaretoken: token};
+                    form_list['new_qm'] = new_qm;
+                    form_list['u_id'] = upon_user;
+                    $.ajax({
+                        url: "/users/api/v1/ajax_change_new_qm/",
+                        method: "POST",
+                        dataType: "json",
+                        data: form_list,
+                        success: function (data) {
+                            console.log(data);
+                            if (data.code == 0) {
+                                $("#qm").html("<span>" + data.data + "</span>");
+                                $("#msg").html("<span style='color:green;'>" + data.msg + "</span>")
+                            }
+                        }
+                    })
+                }else{
+                    alert("您填写的新签名真短")
+                }
+            })
+        });
+
+        function check_img() {
+            var path = $("#update_file").val();
+            if (path.length == 0) {
+                alert("Please upload the hotel logo!");
+                return false;
+            } else {
+                var extStart = path.lastIndexOf('.'),
+                    ext = path.substring(extStart, path.length).toUpperCase();
+                if (ext !== '.PNG' && ext !== '.JPG' && ext !== '.JPEG' && ext !== '.GIF') {
+                    alert("请上传图片（支持：png,jpg,jpeg,gif）");
+                    var file = document.getElementById('update_file');
+                    file.value = '';
+                    return false;
+                }
+            }
+        }
+    </script>
+
+{% endblock %}

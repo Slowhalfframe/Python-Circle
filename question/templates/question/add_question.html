@@ -1,0 +1,241 @@
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <title>Title</title>#}
+{#</head>#}
+{#<body>#}
+{#<h1>提问</h1>#}
+{#<div id="msg"></div>#}
+{#<form method="post">#}
+{#    {% csrf_token %}#}
+{#    <input type="text" id="title" placeholder="写下你的问题，准确地描述更容易得到解答" size="88"><span id="title_tips"></span><br>#}
+{#    <input type="text" id="content" placeholder="输入问题背景，条件等详细信息（选填）" size="99"><br>#}
+{#    <input type="text" id="type_id" name="type_id" hidden>#}
+{#    <input type="text" id="type" name="type" placeholder="至少选择一个分类"><span id="type_tips" style="color: #f00;"></span>#}
+{#    <div id="type_list"></div>#}
+{#    <br>#}
+{#    <a href="javascript:void(0);" id="submit">发布问题</a>#}
+{#</form>#}
+{#{% load static %}#}
+{#<script src="{% static 'js/lib/jquery.js' %}"></script>#}
+{#<script>#}
+{#    $(function () {#}
+{#        $("#type").blur(function () {#}
+{#            type_val = $("#type").val();#}
+{#            if(type_val.length > 0){#}
+{#                $("#type_tips").empty();#}
+{#                var token = $('input[name=csrfmiddlewaretoken]').val();#}
+{#                form_list = {csrfmiddlewaretoken: token};#}
+{#                form_list['type_val'] = type_val;#}
+{#                console.log(form_list);#}
+{#                $.ajax({#}
+{#                    url: "/question/api/v1/get_types/",#}
+{#                    method: "POST",#}
+{#                    dataType: "json",#}
+{#                    data: form_list,#}
+{#                    success: function (data) {#}
+{#                        if(data.code == 0){#}
+{#                            $("#type_list").empty();#}
+{#                            console.log("查到");#}
+{#                            console.log(data.data);#}
+{#                            console.log(jQuery.isEmptyObject(data.data));#}
+{##}
+{#                            if(jQuery.isEmptyObject(data.data) == true){#}
+{#                                $("#type_list").append("未查到相关分类")#}
+{#                            }else{#}
+{#                                for (var key in data.data) {#}
+{#                                    console.log(key + ":" + data.data[key]);#}
+{#                                    $("#type_list").append("<a id='"+key+"' href='javascript:void(0);' onclick=checkd("+key+")>" + data.data[key]+ "</a>")#}
+{#                             }#}
+{#                            }#}
+{#                        }else{#}
+{#                            console.log("未查到");#}
+{#                            console.log(data.msg);#}
+{#                        }#}
+{#                    }#}
+{#                })#}
+{##}
+{#            }else{#}
+{#                console.log("至少输入1个字符");#}
+{#                $("#type_tips").html("至少输入1个字符")#}
+{#            }#}
+{##}
+{#        })#}
+{#    })#}
+{##}
+{#    function checkd(key) {#}
+{#        console.log("asff"+key);#}
+{#        my_text = document.getElementById(key).innerText;#}
+{#        $("#type").empty();#}
+{#        $("#type").val(my_text);#}
+{#        $("#type_id").val(key);#}
+{#        $("#type_list").empty();#}
+{##}
+{#    }#}
+{##}
+{#    $(function () {#}
+{#        $("#submit").click(function () {#}
+{#            title = $("#title").val();#}
+{#            content = $("#content").val();#}
+{#            type_id = $("#type_id").val();#}
+{#            console.log(title, content, type_id);#}
+{#            if(title.length > 3){#}
+{#                $("#title_tips").empty();#}
+{#                if(type_id.length>0){#}
+{#                    var token = $('input[name=csrfmiddlewaretoken]').val();#}
+{#                    form_list = {csrfmiddlewaretoken: token};#}
+{#                    form_list['title'] = title;#}
+{#                    form_list['content'] = content;#}
+{#                    form_list['type_id'] = type_id;#}
+{#                    console.log(form_list);#}
+{#                    $.ajax({#}
+{#                        url: "/question/api/v1/add_question/",#}
+{#                        method: "POST",#}
+{#                        dataType: "json",#}
+{#                        data: form_list,#}
+{#                        success: function (data) {#}
+{#                            if(data.code==0){#}
+{#                                console.log(data.msg);#}
+{#                                console.log(data.data);#}
+{#                                $("#msg").html("<span stle='color:green;'>"+data.msg+"</span>");#}
+{#                                // 跳转至您的问题详情页#}
+{#                                setTimeout("javascript:location.href='/question/answer/"+data.data+"/'", 2000);#}
+{#                            }else{#}
+{#                                console.log(data.msg);#}
+{#                                console.log(data.code);#}
+{#                            }#}
+{#                        }#}
+{#                    })#}
+{#                }else{#}
+{#                    $("#type_tips").html("请选择问题类型")#}
+{#                }#}
+{#            }else{#}
+{#                $("#title_tips").html("问题标题不能少于4个字符")#}
+{#            }#}
+{#        })#}
+{#    })#}
+{##}
+{#</script>#}
+{#</body>#}
+{#</html>#}
+{% extends 'base.html' %}
+{% block title_name %}撰写您的问题{% endblock %}
+{% block main %}
+    {% load static %}
+    <div class="col-md-8">
+        <div id="msg" style="margin: 50px 0"></div>
+        <h2 style="font-size: 22px;">提出您的问题，我们一起来解答</h2><br>
+        <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+            <input type="text" class="form-control" id="title" placeholder="写下你的问题，准确地描述更容易得到解答" size="88"><span id="title_tips"></span><br>
+            <input type="text" class="form-control" id="content" placeholder="输入问题背景，条件等详细信息（选填）" size="99"><br>
+            <input type="text"  id="type_id" name="type_id" hidden>
+            <input type="text" class="form-control" id="type" name="type" placeholder="至少选择一个分类,输入后点击选择"><span id="type_tips" style="color: #f00;"></span>
+            <div id="type_list"></div>
+            <br>
+            <a href="javascript:void(0);" id="submit">发布问题</a>
+        </form>
+    </div>
+
+{% endblock %}
+{% block js %}
+    <script>
+    $(function () {
+        $("#type").blur(function () {
+            type_val = $("#type").val();
+            if(type_val.length > 0){
+                $("#type_tips").empty();
+                var token = $('input[name=csrfmiddlewaretoken]').val();
+                form_list = {csrfmiddlewaretoken: token};
+                form_list['type_val'] = type_val;
+                console.log(form_list);
+                $.ajax({
+                    url: "/question/api/v1/get_types/",
+                    method: "POST",
+                    dataType: "json",
+                    data: form_list,
+                    success: function (data) {
+                        if(data.code == 0){
+                            $("#type_list").empty();
+                            console.log("查到");
+                            console.log(data.data);
+                            console.log(jQuery.isEmptyObject(data.data));
+
+                            if(jQuery.isEmptyObject(data.data) == true){
+                                $("#type_list").append("未查到相关分类")
+                            }else{
+                                for (var key in data.data) {
+                                    console.log(key + ":" + data.data[key]);
+                                    $("#type_list").append("<a id='"+key+"' href='javascript:void(0);' onclick=checkd("+key+")>" + data.data[key]+ "</a>")
+                             }
+                            }
+                        }else{
+                            console.log("未查到");
+                            console.log(data.msg);
+                        }
+                    }
+                })
+
+            }else{
+                console.log("至少输入1个字符");
+                $("#type_tips").html("至少输入1个字符")
+            }
+
+        })
+    })
+
+    function checkd(key) {
+        console.log("asff"+key);
+        my_text = document.getElementById(key).innerText;
+        $("#type").empty();
+        $("#type").val(my_text);
+        $("#type_id").val(key);
+        $("#type_list").empty();
+
+    }
+
+    $(function () {
+        $("#submit").click(function () {
+            title = $("#title").val();
+            content = $("#content").val();
+            type_id = $("#type_id").val();
+            console.log(title, content, type_id);
+            if(title.length > 3){
+                $("#title_tips").empty();
+                if(type_id.length>0){
+                    var token = $('input[name=csrfmiddlewaretoken]').val();
+                    form_list = {csrfmiddlewaretoken: token};
+                    form_list['title'] = title;
+                    form_list['content'] = content;
+                    form_list['type_id'] = type_id;
+                    console.log(form_list);
+                    $.ajax({
+                        url: "/question/api/v1/add_question/",
+                        method: "POST",
+                        dataType: "json",
+                        data: form_list,
+                        success: function (data) {
+                            if(data.code==0){
+                                console.log(data.msg);
+                                console.log(data.data);
+                                $("#msg").html("<span stle='color:green;'>"+data.msg+"</span>");
+                                // 跳转至您的问题详情页
+                                setTimeout("javascript:location.href='/question/answer/"+data.data+"/'", 2000);
+                            }else{
+                                console.log(data.msg);
+                                console.log(data.code);
+                            }
+                        }
+                    })
+                }else{
+                    $("#type_tips").html("请选择问题类型")
+                }
+            }else{
+                $("#title_tips").html("问题标题不能少于4个字符")
+            }
+        })
+    })
+
+</script>
+{% endblock %}

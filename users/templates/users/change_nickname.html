@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改昵称</title>
+</head>
+<body>
+    <div id="msg"></div>
+    <h4>当前昵称：</h4><span id="on_name"></span>
+    <h4>修改后：</h4> <input type="text" name="new_name" id="new_name" placeholder="输入修改后的昵称">
+    <a href="javascript:void(0);" id="chage_name">修改</a>
+    {% csrf_token %}
+
+
+{% load static %}
+<script src="{% static 'js/lib/jquery.js' %}"></script>
+    <script>
+        $(document).ready(function (){
+            var token = $('input[name=csrfmiddlewaretoken]').val();
+            upon_user = {{request.user.id}}
+            form_list = {csrfmiddlewaretoken: token};
+            form_list['u_id'] = upon_user;
+            $.ajax({
+                url: "/users/api/v1/ajax_change_name/",
+                method: "POST",
+                dataType: "json",
+                data: form_list,
+                success:function (data) {
+                    console.log(data)
+                    $("#on_name").html("<span style='color:green;'>" + data.data + "</span>")
+                    if (data.code == 0){
+                    // window.location.href="/users/";
+                    //     setTimeout("javascript:location.href='/users/'", 2000);
+                        }
+                }
+            })
+        });
+        $(function () {
+            $("#chage_name").click(function () {
+                upon_user = {{request.user.id}}
+                new_name = $("#new_name").val();
+                var token = $('input[name=csrfmiddlewaretoken]').val();
+                form_list = {csrfmiddlewaretoken: token};
+                form_list['new_name'] = new_name;
+                form_list['u_id'] = upon_user;
+                $.ajax({
+                    url: "/users/api/v1/ajax_change_new_name/",
+                    method: "POST",
+                    dataType: "json",
+                    data: form_list,
+                    success:function (data) {
+                        console.log(data);
+                        if (data.code == 0){
+                            $("#on_name").html("<span style='color:green;'>" + data.data + "</span>");
+                            $("#msg").html("<span style='color:green;'>" + data.msg + "</span>")
+                            // $("#new_name").attr("placeholder",new_name);
+                            // $("#new_name").attr("value","aaa");
+                            $("#new_name").val("")
+                            }
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+</html>

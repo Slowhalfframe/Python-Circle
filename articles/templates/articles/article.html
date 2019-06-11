@@ -1,0 +1,394 @@
+{% extends 'base.html' %}
+{% block title_name %}{{article.title}} python圈|(Circle) -- 人生苦短，我用Python{% endblock %}
+{% block main %}
+    {% load static %}
+<a name="top"></a>
+    <link rel="stylesheet" href="{% static 'articles/css/app/article.css' %}">
+<style>
+	#back_top{
+		position: fixed;
+		right: 5%;
+		bottom: 5%;
+		display: block;
+		width: auto;
+		height: auto;
+		border:1px solid #acf;
+		padding: 3px;
+		background-color: #3a87ad;
+		color: #fff;
+	}
+	#operation{
+		margin: 30px 35%;
+		height: 50px;
+	}
+	#operation  button{
+		width: 35%;
+		height: 35px;
+		background-color: #5cb85c;
+		color: #fff;
+	}
+	pre{
+		background-color: #333;
+		color: #f9f9f9;
+		padding: 20px;
+		line-height: 20px;
+		font-size: 15px;
+	}
+</style>
+    <div class="col-md-9 a-main-left">
+				<div id="a_content">
+					<div id="title">
+						<div class="">
+							<ol class="breadcrumb">
+							  <li style="color: #009a61;"><a href="/articles/show_article_type/{{article.article_type.parent.pk}}/">{{ article.article_type.parent.name }}</a></li>
+                            	<li class="active" style="color: #5cb85c;"><a href="/articles/show_article_type/{{article.article_type.pk}}/">{{ article.article_type.name }}</a></li>
+							  <li class="active">文章详情</li>
+							</ol>
+						</div>
+						<div id="bt">
+							<h3>{{article.title}}</h3>
+						</div>
+						<div id="a_other">
+							<p>
+								{% if article.article_from == 'yuanchuang' %}
+								<span id="yc">原创</span>
+								{% elif article.article_from == 'zhuanzai'%}
+								<span id="zz">转载</span>
+								{%endif%}
+								<span class="info">{{article.count}}阅读 · </span>
+							<span class="info">时间{{article.create_time}}</span>
+                                {% if request.user == article.user %}
+                                | <a href="/articles/update_article/?article_id={{article.id}}">修改文章</a>
+                                {% else %}{% endif %}
+
+							</p>
+						</div>
+					</div>
+					<div id="article_content">
+						{{article.content | safe}}
+
+					</div>
+					<hr>
+					<div id="operation">
+						<button id="zan1" class="pull-left" style="display: inline-block;"> 赞  |  {{ article.zan_num }}</button>
+						<span id="off-favorites-box">
+							{% if is_f_a  %}
+						<button class="pull-right" style="display: inline-block;background-color: darkolivegreen;" id="off-favorites" onclick="off_favorites_articles({{article.id}})">取消收藏 | {{favortes_count}}</button>
+						{% else %}
+							<button class="pull-right" style="display: inline-block;" id="favorites" onclick="favorites_articles({{article.id}})">收藏文章 | {{favortes_count}}</button>
+						{% endif %}
+						</span>
+
+					</div>
+
+                <p><b>评论</b></p>
+                <div class="comment_tree">
+                </div>
+
+
+					<!-- 评论 -->
+                    <div id="pinglun">
+                        <textarea class="form-control" rows="6" id="pl_content"></textarea>
+                        <button type="submit" id="pl_submit" class="btn btn-success btn-block">评论</button>
+{#						<div class="history">#}
+{#                            {% for pl in pl %}#}
+{#							<div class="pl">#}
+{#								<div class="pull-left">#}
+{#									<img src="/{{ pl.user_more_info.u_header }}" class="pl_hear">#}
+{#								</div>#}
+{#								<div class="pull-left pl_main" id="pl_main_box{{ pl.id }}">#}
+{#									<h5 class="pl_user"><a href="">{{pl.user_more_info.u_nick_name}}</a>：</h5>#}
+{#                                    <div class="pl_content">#}
+{#                                        {{ pl.content }} &nbsp; | &nbsp; <a href="javascript:void(0);" onclick="huifu_pl({{ pl.id }})" style="color: #1483d8;">回复</a>#}
+{#                                    </div>#}
+{##}
+{#                                  <textarea style="width: 100%"></textarea>#}
+{#								</div>#}
+{##}
+{#                                <div class="zw" style="clear:both;"></div>#}
+{#							</div>#}
+{#                            {% endfor %}#}
+{#						</div>#}
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3 a-main-right">
+				<div id="auth">
+					<div id="auth_hear">
+						<a href="/users/user_detail/?id={{article.user.id}}"><img src="/static/articles/uepload/{{ article.user_more_info.u_header }}" class="img-responsive img-circle"></a>
+					</div>
+					<div id="auth_name">
+						<a href="/users/user_detail/?id={{article.user.id}}"><h4 class="text-center" style="font-size: 15px;">{{article.user_more_info.u_nick_name}}</h4></a>
+					</div>
+					<div id="auth_qm">
+						<p class="text-center">{{article.user_more_info.u_autograph}}</p>
+					</div>
+				</div>
+				<div class="panel panel-default" style="margin-top: 15px;">
+				  <div class="panel-heading">相关文章推荐
+					  <a href="http://www.ofus.ink/question/answer/5/" target="_blank" title="您有更好的建议？点击告诉管理员吧！"><span class="layui-badge-rim layui-bg-orange pull-right">?</span></a>
+				  </div>
+				  <div class="panel-body" style="padding: 0;">
+					<div class="list-group" id="tj_article" style="margin:0;">
+					</div>
+				  </div>
+				</div>
+
+				<div class="panel panel-default" style="margin-top: 15px;">
+				  <div class="panel-heading">热门文章推荐
+					  <a href="javascript:void(0);" title="根据文章阅读量显示前五"><span class="layui-badge-rim layui-bg-orange pull-right">!</span></a>
+				  </div>
+					<ul class="list-group">
+					  {% for hot_article_num in hot_article_num %}
+					<li class="list-group-item" style="height: 35px;">
+						<a target="_blank" href="/articles/article/{{hot_article_num.id}}/">{{hot_article_num.title | truncatechars:25}}</a>
+					</li>
+					  {% endfor %}
+				  </ul>
+				</div>
+				
+				<button class="btn btn-default btn-block" onclick="window.open('https://jq.qq.com/?_wv=1027&k=5tsKZJl')">加入QQ群</button>
+				<footer>
+            &copy; 2019 python圈 | (Circle) 专注python相关技术<br>
+            科技界的一股清流，情怀程序yuan！<br>
+            备案号：<a href="http://www.miibeian.gov.cn">豫ICP备18037195号-1</a>
+            <p><a href="http://www.ofus.ink/sitemap.xml">网站地图</a> | <a href="http://www.ofus.ink/robots.txt">robots协议</a></p>
+            <div id="link">
+                <b>友情链接: </b>
+                <a href="https://www.baidu.com/">百度</a> |
+                <a href="https://www.so.com/">360搜索</a> |
+                <a href="https://www.google.com.hk/">谷歌</a>
+            </div>
+        </footer>
+				<a href="#top" id="back_top">回到顶部</a>
+			</div>{% csrf_token %}
+{% endblock %}
+{% block js %}
+    <script>
+
+		function favorites_articles(obj){
+			var u = 'AnonymousUser';
+            var login = '{{ request.user }}';
+            if(login == u){
+                alert("请先登录")
+                window.location.href='/users/'
+            }else {
+				var token = $('input[name=csrfmiddlewaretoken]').val();
+				form_list = {csrfmiddlewaretoken: token};
+				form_list['article_id'] = obj;
+				$.ajax({
+					url: '/articles/api/v1/favorites_articles/',
+					method: 'POST',
+					dataType: 'json',
+					data: form_list,
+					success: function (data) {
+						console.log(data);
+						if (data.code == 0) {
+							// $("#favorites").css('display','none');
+							$("#off-favorites-box").empty();
+							$("#off-favorites-box").html('<button class="pull-right" style="display: inline-block;background-color: darkolivegreen;" id="off-favorites" onclick="off_favorites_articles({{article.id}})">取消收藏 | ' + data.data + '</button>')
+						}
+					}
+				})
+			}
+		}
+
+		function off_favorites_articles(obj){
+			var token = $('input[name=csrfmiddlewaretoken]').val();
+			form_list = {csrfmiddlewaretoken: token};
+			form_list['article_id'] = obj;
+			console.log(form_list)
+			$.ajax({
+				url: '/articles/api/v1/off_favorites_articles/',
+				method: 'POST',
+				dataType: 'json',
+				data: form_list,
+				success: function (data) {
+					console.log(data);
+					if(data.code==0){
+						// $("#off-favorites").css('display','none');
+						$("#off-favorites-box").empty();
+						$("#off-favorites-box").html('<button class="pull-right" style="display: inline-block;" id="favorites" onclick="favorites_articles({{article.id}})">收藏文章 | '+data.data+'</button>')
+					}
+				}
+			})
+		}
+
+
+        $(document).ready(function () {
+            console.log({{ article.id }});
+            $.ajax({
+                url : '/articles/api/v1/get_pl/',
+                data : {'id':{{article.id}}},
+                success: function (data) {
+                    console.log(data)
+                    $.each(data, function (index, comment_dict) {
+                        var s = '<div id="pl_main_box'+ comment_dict.pk +'" comment_id="'+ comment_dict.pk +'" class="comment-item media" style="padding-right:0;padding-left:30px;"><div class="media-left"><a href=""><img class="media-object img-circle" style="width:33px;height:auto;dispaly:inline-block;margin:0;" src="\\'+ comment_dict.user__user_more_info__u_header +'"></a></div><div class="media-body"><h5 class="media-heading">'+ comment_dict.user__user_more_info__u_nick_name +'<small>'+ comment_dict.create_time +'</small></h5><p class="content">'+ comment_dict.content +'</p></div><div class="media-right"><a href="javascript:void(0);" onclick="huifu_pl('+ comment_dict.pk +')" style="color: #1483d8;">回复</a></div></div>'
+                        if (comment_dict.pinglun_parent){
+                            pid = comment_dict.pinglun_parent;
+                            $("[comment_id="+pid+"]").append(s)
+                        }else{
+                            $(".comment_tree").append(s)
+                        }
+                    })
+                }
+            })
+        })
+
+		$(document).ready(function () {
+			var type_id = {{ article.article_type.id }};
+			$.ajax({
+				url: "/articles/api/v1/get_same_type/?type_id="+type_id,
+				method: "GET",
+				dataType: "json",
+				success: function (data) {
+					console.log(data);
+					var count = 0;
+					$("#tj_article").empty();
+					while (count<data.data.length){
+						html = '<a href="/articles/article/'+ data.data[count].pk +'/" class="list-group-item">'+ data.data[count].name +'</a>';
+						$("#tj_article").append(html);
+						count += 1
+
+					}
+				}
+			})
+		})
+
+
+        $("#zan1").click(function () {
+            var u = 'AnonymousUser';
+            var login = '{{ request.user }}';
+            if(login == u){
+                alert("请先登录")
+                window.location.href='/users/'
+            }else {
+                var article_id = {{ article.id }}
+                var token = $('input[name=csrfmiddlewaretoken]').val();
+                form_list = {csrfmiddlewaretoken: token};
+                form_list['article_id'] = article_id;
+                console.log(form_list);
+                $.ajax({
+                    url: "/articles/api/v1/zan_add/",
+                    method: "POST",
+                    dataType: "json",
+                    data: form_list,
+                    success: function (data) {
+                        console.log(data);
+                        if(data.code == 0){
+                            $("#zan1").empty();
+                            $("#zan1").html(" 赞  |  "+data.data)
+                        }
+                        if(data.code == -99){
+                            console.log(data.data);
+                            window.location.href=data.data
+                        }
+                        else{
+                            console.log(data.code, data.msg)
+                        }
+                    }
+                })
+            }
+        });
+
+        $("#pl_submit").click(function () {
+            var u = 'AnonymousUser';
+            var login = '{{ request.user }}';
+            if(login == u){
+                alert("请先登录");
+                window.location.href='/users/';
+            }else {
+                var pl_content = $('#pl_content').val();
+                if(pl_content.length>0){
+                    var article_id = {{ article.id }}
+                    var token = $('input[name=csrfmiddlewaretoken]').val();
+                    form_list = {csrfmiddlewaretoken: token};
+                    form_list['article_id'] = article_id;
+                    form_list['pl_content'] = pl_content;
+                    console.log(form_list);
+                    $.ajax({
+                        url: "/articles/api/v1/add_pl/",
+                        method: "POST",
+                        dataType: "json",
+                        data: form_list,
+                        success: function (data) {
+                            if(data.code == 0){
+                                $("#pl_content").val("");
+                                html = "<div class='pl'><div class='pull-left'><img src='/"+ data.data.header +"'class='pl_hear'></div><div class='pull-left'><h5 class='pl_user'><a href=''>"+ data.data.nickname +"</a>：</h5><div class='pl_content'>"+ data.data.content +"</div></div></div>"
+                                $(".comment_tree").append(html);
+                                console.log(html)
+                            }else{
+                                console.log(data.code, data.msg)
+                            }
+                        }
+                    })
+                }else{
+                    alert("请正确填写评论内容")
+                }
+            }
+        })
+
+        function huifu_pl(obj) {
+            var u = 'AnonymousUser';
+            var login = '{{ request.user }}';
+            if(login == u){
+                alert("请先登录");
+                window.location.href='/users/';
+            }else {
+            console.log(obj);
+            $("#hf").empty();
+            var zhi = "huifu_content("+obj+")";
+            $("#pl_main_box" + obj).append("<div id='hf'><textarea id='neirong' style='width: 100%'></textarea> <button onclick='"+ zhi +"'>回复</button></div>")
+            }
+        }
+
+        function huifu_content(obj) {
+            console.log(obj);
+            var pl_neirong = $("#neirong").val();
+            if(pl_neirong.length > 0){
+                var article_id = {{ article.id }}
+                var pl_id = obj;
+                var token = $('input[name=csrfmiddlewaretoken]').val();
+                console.log(pl_id, pl_neirong, article_id)
+                form_list = {csrfmiddlewaretoken: token};
+                form_list['article_id'] = article_id;
+                form_list['pl_id'] = pl_id;
+                form_list['pl_neirong'] = pl_neirong;
+                console.log(form_list);
+                $.ajax({
+                    url: "/articles/api/v1/add_plhf/",
+                    method: "POST",
+                    dataType: "json",
+                    data: form_list,
+                    success: function (data) {
+                        console.log(data)
+                        if(data.code == 0){
+                            // 成功显示再html 关闭评论框
+                            $("#hf").empty();
+                            var s = '<div id="pl_main_box'+ data.data.pk +'" comment_id="'+ data.data.pk +'" class="comment-item media"><div class="media-left"><a href=""><img class="media-object img-circle" style="width:33px;height:auto;dispaly:inline-block;margin:0;" src="\\'+ data.data.header +'"></a></div><div class="media-body"><h5 class="media-heading">'+ data.data.nickname +'<small>'+ data.data.create_time +'</small></h5><p class="content">'+ data.data.content +'</p></div><div class="media-right"><a href="javascript:void(0);" onclick="huifu_pl('+ data.data.pk +')" style="color: #1483d8;">回复</a></div></div>'
+                            $("#pl_main_box"+obj).append(s)
+                            console.log(s)
+                        }else{
+                            // alert 提示哪种报错
+                            alert(data.msg)
+                        }
+                    }
+                });
+            }else{
+                alert("请正确填写回复评论内容")
+            }
+        }
+    (function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+    </script>
+{% endblock %}

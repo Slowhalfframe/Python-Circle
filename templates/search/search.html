@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title_name %}
+搜索结果
+{% endblock %}
+{% block main %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'articles/css/app/article.css' %}">
+<div class="col-md-8 main-left">
+    <div class="content">
+        <div id="articles_box">
+            {% for result in page.object_list %}
+            <div class="media">
+                <ol class="breadcrumb" style="margin: 0;background-color: #fff;padding-left: 0px;">
+                    <li style="color: #009a61;"><a
+                            href="/articles/show_article_type/{{result.object.article_type.parent.pk}}/">{{ result.object.article_type.parent.name }}</a></li>
+                    <li class="active" style="color: #5cb85c;"><a
+                            href="/articles/show_article_type/{{result.object.article_type.pk}}/">
+                        {{ result.object.article_type.name }}</a></li>
+                </ol>
+                <h4 class="media-heading"><a target="_blank" href="/articles/article/{{ result.object.id }}">{{ result.object.title }}</a>&nbsp;<small>
+                    {% if result.object.article_from == 'yuanchuang' %}
+                    <span id="yc">原创</span>
+                    {% elif result.object.article_from == 'zhuanzai'%}
+                    <span id="zz">转载</span>
+                    {%endif%}
+                </small>
+                </h4>
+                <div class="media-body">
+                    <div class="zhaiyao">
+                        {{ result.object.zhaiyao|safe|truncatechars:79 }}
+                    </div>
+                    <div class="info">
+                        发布时间：{{ result.object.create_time }} | 阅读量：{{ result.object.count }} | <a
+                            href="/users/user_detail/?id={{ result.object.user.id }}">作者：{{ result.object.user_more_info.u_nick_name }}</a>
+                    </div>
+                </div>
+                {% if a.cover_img %}
+                <div class="media-left">
+                    <a href="/articles/article/{{ result.object.id }}">
+                        <img class="media-object show_header"
+                             src="/static/articles/uepload/{{ result.object.cover_img }}">
+                    </a>
+                </div>
+                {% else %}
+
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% if page.has_previous or page.has_next %}
+        <div class="row  col-md-8 col-md-offset-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if page.has_previous %}
+                    <li>
+                        <a href="?q={{ query }}&amp;page={{ page.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for p in page.paginator.page_range %}
+                    <li><a href="?q={{ query }}&amp;page={{ p }}">{{ p }}</a></li>
+                    {% endfor %}
+                    {% if page.has_next %}
+
+                    <li>
+                        <a href="?q={{ query }}&amp;page={{ page.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+        </div>
+        {% endif %}
+
+
+    </div>
+</div>
+<div class="col-md-4 main-right">
+    <div class="type">
+        <a class='btn btn-default' href="/articles/add_article/">写文章</a>
+    </div>
+    <br>
+    <button class="btn btn-block btn-default" onclick="window.open('https://jq.qq.com/?_wv=1027&k=5tsKZJl')">加入QQ群</button>
+    <footer>
+            &copy; 2019 python圈 | (Circle) 专注python相关技术<br>
+            科技界的一股清流，情怀程序yuan！<br>
+            备案号：<a href="http://www.miibeian.gov.cn">豫ICP备18037195号-1</a>
+            <p><a href="http://www.ofus.ink/sitemap.xml">网站地图</a> | <a href="http://www.ofus.ink/robots.txt">robots协议</a></p>
+            <div id="link">
+                <b>友情链接: </b>
+                <a href="https://www.baidu.com/">百度</a> |
+                <a href="https://www.so.com/">360搜索</a> |
+                <a href="https://www.google.com.hk/">谷歌</a>
+            </div>
+        </footer>
+</div>
+{% endblock %}

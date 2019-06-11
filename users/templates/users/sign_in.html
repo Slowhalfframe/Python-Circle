@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title_name %}登录 - python圈|(Circle)--人生苦短，我用Python python相关技术社区{% endblock %}
+{% block main %}
+    <style>
+        body{
+            background-color: #76b852;
+        }
+        .login{
+            width: 80%;
+            height: 360px;
+            background-color: #fff;
+            margin: 150px auto;
+            padding: 33px;
+        }
+        #sign_in{
+            margin: 20px 0;
+        }
+    form{
+        padding: 22px;
+    }
+    </style>
+    <div class="col-md-6 col-md-offset-3 col-xs-12 col-sm-12">
+{#        <h1>登录界面</h1>#}
+        <div class="login">
+            <form>
+            {% csrf_token %}
+            <input type="email" class="form-control" name="email" id="email" placeholder="请输入您的邮箱"><br>
+            <input type="password" class="form-control" name="password" id="password" placeholder="请输入您的密码"><br>
+            <input class="pull-left" type="checkbox"  name="islong" id="islong"> 七天免密登录
+                <a href="/users/forget_password/" class="pull-right">忘记密码？</a>
+            <input type="text" name="next" id="next" value="{{next_url}}" hidden>
+            <a href="javascript:void(0);" class="btn btn-success btn-block" id="sign_in">登录</a>
+                <p class="text-center">还没有用户？<a href="/users/register/" style="color: #4CAF50;">立刻创建</a></p>
+        </form>
+            <p id="msg" class="text-center"></p>
+        </div>
+        {% load static %}
+        <script src="{% static 'js/lib/jquery.js' %}"></script>
+        <script src="{% static 'users/js/app/sign_in.js' %}"></script>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,3 @@
+{{ object.title }}
+{{ object.article_type }}
+{{ object.content }}

@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% block title_name %}{{ user_more_info.u_nick_name }}的主页 - python圈|(Circle)--人生苦短，我用Python python相关技术社区{% endblock %}
+{% block main %}
+
+    <style>
+        .top_box {
+            width: 100%;
+            height: 134px;
+            background-color: #eee;
+        }
+
+        .bottom_box {
+            width: 100%;
+            height: 134px;
+            background: #fff;
+        }
+
+        .header {
+            width: 150px;
+            height: 150px;
+            margin-top: -50px;
+            margin-left: 20px;
+        }
+
+        .header img {
+            border-radius: 15px;
+        }
+
+        .infos {
+            margin: 33px;
+        }
+
+        .name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .qm {
+            margin: 25px 0;
+        }
+
+        .change {
+            margin: 66px 30px;
+        }
+        #num{
+            color: #999;
+        }
+    h4{
+        padding: 10px 0 5px;
+    }
+                    #follow {
+        background-color: #fff;
+        width: 100%;
+        height: 99px;
+        margin-top: 35px;
+        line-height: 99px;
+        text-align: center;
+        font-size: 19px;
+    }
+
+    #follow > span {
+        width: 49%;
+        /*background-color: #aaa;*/
+        display: inline-block;
+    }
+
+    #follow > span:last-child {
+        border-left: 1px solid #abc;
+    }
+    </style>
+    <div class="boxs">
+        <div class="top_box">
+        </div>
+        <div class="bottom_box">
+            <div class="header pull-left">
+                <img src="/static/articles/uepload/{{ user_more_info.u_header }}" width="100%" height="100%">
+            </div>
+            <div class="infos pull-left">
+                <div class="name">{{ user_more_info.u_nick_name }}</div>
+                <div class="qm">{{ user_more_info.u_autograph }}</div>
+            </div><input type="text" value="{{user_more_info.u_link_user.id}}" hidden id="user_id">
+            <div class="change pull-right">
+                <span id="is_follow">
+                {% if is_f_a %}
+                    <button class="btn btn-success" onclick="follow()">关注</button>
+                {% else %}
+                    <button class="btn btn-default" onclick="follow()">取消关注</button>
+                {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div>
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#article" aria-controls="article" role="tab" data-toggle="tab">文章 <span id="num">{{ article_count }}</span></a></li>
+                <li role="presentation"><a href="#answer" aria-controls="answer" role="tab" data-toggle="tab">回答 <span id="num">{{ answer_count }}</span></a></li>
+                <li role="presentation"><a href="#question" aria-controls="question" role="tab" data-toggle="tab">提问 <span id="num">{{ question_count }}</span></a></li>
+                <li role="presentation"><a href="#favorites_articles" aria-controls="favorites_articles" role="tab" data-toggle="tab">收藏 <span id="num">{{ favorites_articles_count }}</span></a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <!-- 热文章 -->
+                <div role="tabpanel" class="tab-pane active" id="article">
+                    {% for a in articles %}
+                    <div class="media">
+                        <h4 class="media-heading"><a href="/articles/article/{{ a.id }}">{{ a.title }}</a></h4>
+                        <div class="media-body">
+                            <div class="zhaiyao">
+                                {{ a.zhaiyao|safe|truncatechars:79 }}
+                            </div>
+                            <div class="info">
+                                发布时间：{{ a.create_time }} | 阅读量：{{ a.count }}
+                            </div>
+                        </div>
+                        {% if a.cover_img %}
+                        <div class="media-left">
+                            <a href="/articles/article/{{ a.id }}">
+                                <img class="media-object show_header" src="/static/articles/uepload/{{ a.cover_img }}">
+                            </a>
+                        </div>
+                        {% else %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                </div>
+                <!-- 回答 -->
+                <div role="tabpanel" class="tab-pane" id="answer">
+                    {% for a in answer %}
+                    <div class="media">
+                        <h4 class="media-heading"><a href="/articles/article/{{ a.link_question_id }}">{{ a.link_question.q_title }}</a></h4>
+                        <div class="media-body">
+                            <div class="zhaiyao">
+                                {{ a.a_content|safe|truncatechars:79 }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+                <!-- 提问 -->
+                <div role="tabpanel" class="tab-pane" id="question">
+                    {% for q in question %}
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <a href="/question/answer/{{ q.id }}/">{{ q.q_title }}</a>
+                        </li>
+                    </ul>
+                    {% endfor %}
+                </div>
+                <!--收藏-->
+                <div role="tabpanel" class="tab-pane" id="favorites_articles">
+                    <ul class="list-group">
+                        {% for f_a in favorites_articles %}
+                        <li class="list-group-item">
+                            <a href="/articles/article/{{f_a.favorites_articles.id}}/">{{ f_a.favorites_articles.title }}</a>
+                            <!--<a class="pull-right" href="javascript:void(0);" >取消收藏</a>-->
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="col-md-4">
+    <div id="follow">
+        <span>关注：{{follow_count}}</span>
+        <span>被关注：{{fan_count}}</span>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+                function follow() {
+                    var u = 'AnonymousUser';
+                    var login = '{{ request.user }}';
+                    if(login == u){
+                        alert("请先登录")
+                        window.location.href='/users/'
+                    }else {
+                        var token = $('input[name=csrfmiddlewaretoken]').val();
+                        form_list = {csrfmiddlewaretoken: token};
+                        var user_id = $("#user_id").val();
+                        form_list['user_id'] = user_id;
+                        console.log(form_list)
+                        $.ajax({
+                            url: "/users/api/v1/follow/",
+                            method: "POST",
+                            dataType: "json",
+                            data: form_list,
+                            success: function (data) {
+                                console.log(data);
+                                if(data.code == 0){
+                                    $("#is_follow").empty();
+                                    if(data.data){
+                                        $("#is_follow").html('<button class="btn btn-default" onclick="follow()">取消关注</button>')
+                                        alert(data.msg)
+                                    }else{
+                                        $("#is_follow").html('<button class="btn btn-success" onclick="follow()">关注</button>')
+                                        alert(data.msg)
+                                    }
+                                }
+                                else{
+                                    console.log(data.code)
+                                }
+                            }
+                        })
+                    }
+                }
+            </script>
+
+
+{% endblock %}
