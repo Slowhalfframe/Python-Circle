@@ -16,10 +16,10 @@ def mail(user_email, id):
     print(token)
     url = "http://www.ofus.ink/users/email_verification/{0}".format(token)
     # 发件人邮箱账号
-    my_sender = '1441576268@qq.com'
+    my_sender = '发件人邮箱账号'
 
     # 发件人邮箱密码 密码不是真正的密码是 授权码，授权码是用于登录第三方邮件客户端的专用密码。
-    my_pass = 'szlcejiprutxbafa'
+    my_pass = '授权码'
 
     # 收件人邮箱账号
     # my_user = '18569938068@163.com'
@@ -47,11 +47,14 @@ def forget_email(user_email, id):
     token = token.decode('utf8')
     print(token)
     url = "http://www.ofus.ink/users/forget_pwd/{0}".format(token)
-    # 发件人邮箱账号
-    my_sender = '1441576268@qq.com'
+     # 发件人邮箱账号
+    my_sender = '发件人邮箱账号'
 
     # 发件人邮箱密码 密码不是真正的密码是 授权码，授权码是用于登录第三方邮件客户端的专用密码。
-    my_pass = 'szlcejiprutxbafa'
+    my_pass = '授权码'
+
+    # 收件人邮箱账号
+    # my_user = '18569938068@163.com'
 
     # 收件人邮箱账号
     # my_user = '18569938068@163.com'
@@ -74,10 +77,12 @@ def forget_email(user_email, id):
 
 def follow_email(user_email, str):
     url = "http://www.ofus.ink/users/my_page/"
-    # 发件人邮箱账号
-    my_sender = '1441576268@qq.com'
+     # 发件人邮箱账号
+    my_sender = '发件人邮箱账号'
+
     # 发件人邮箱密码 密码不是真正的密码是 授权码，授权码是用于登录第三方邮件客户端的专用密码。
-    my_pass = 'szlcejiprutxbafa'
+    my_pass = '授权码'
+    
     # 收件人邮箱账号
     # my_user = '18569938068@163.com'
     my_user = user_email
