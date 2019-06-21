@@ -8,9 +8,9 @@ def mail(article_auth_email,article_auth_name, article_name, article_id, user_na
     token = article_id
     url = "http://www.ofus.ink/articles/article/{0}/".format(token)
     # 发件人邮箱账号
-    my_sender = '1441576268@qq.com'
+    my_sender = '发件人邮箱账号'
     # 发件人邮箱密码 密码不是真正的密码是 授权码，授权码是用于登录第三方邮件客户端的专用密码。
-    my_pass = 'szlcejiprutxbafa'
+    my_pass = '授权码'
     # 收件人邮箱账号
     # my_user = '18569938068@163.com'
     my_user = article_auth_email
@@ -32,10 +32,10 @@ def mail(article_auth_email,article_auth_name, article_name, article_id, user_na
 
 def pl_email(to_name, to_email, from_name, from_content, article_title, token):
     url = "http://www.ofus.ink/articles/article/{0}/".format(token)
-    # 发件人邮箱账号
-    my_sender = '1441576268@qq.com'
+        # 发件人邮箱账号
+    my_sender = '发件人邮箱账号'
     # 发件人邮箱密码 密码不是真正的密码是 授权码，授权码是用于登录第三方邮件客户端的专用密码。
-    my_pass = 'szlcejiprutxbafa'
+    my_pass = '授权码'
     # 收件人邮箱账号
     # my_user = '18569938068@163.com'
     my_user = to_email
